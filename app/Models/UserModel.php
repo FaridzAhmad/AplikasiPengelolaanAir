@@ -6,14 +6,19 @@ class UserModel extends Model
 {
     protected $table = 'pengguna'; 
     protected $primaryKey = 'id';
-    protected $allowedFields = ['users_id', 'nama', 'rt', 'rw', 'desa_id', 'kecamatan_id', 'no_hp', 'foto'];
+    protected $allowedFields = ['id_meteran', 'users_id', 'nik', 'nama', 'rt', 'rw', 'alamat', 'no_hp', 'foto','status_meteran'];
 
-    public function getUserName()
+    public function getBelumAktif()
     {
-        return $this->db->table('pengguna')
-            ->select('pengguna.*,users.email') 
-            ->join('users', 'users.id = pengguna.users_id')
-            ->get()
-            ->getRowArray(); 
+        return $this->where('status_meteran', 'belum aktif')
+                    ->findAll();
     }
+
+    public function getAktif()
+    {
+        return $this->where('status_meteran', 'aktif')
+                    ->findAll();
+    }
+
+
 }

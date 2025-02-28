@@ -30,7 +30,7 @@
         <p class="lead">Kelola penggunaan air dengan mudah dan efisien</p>
         <div class="mt-4">
             <a href="/login" class="btn btn-primary btn-lg btn-custom">Masuk</a>
-            <a href="/register" class="btn btn-success btn-lg btn-custom  disabled">Daftar</a>
+            <a href="/register" class="btn btn-success btn-lg btn-custom">Daftar</a>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

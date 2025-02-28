@@ -8,6 +8,10 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\AdminModel;
+use App\Models\PetugasModel;
+use App\Models\UserModel;
+
 
 /**
  * Class BaseController
@@ -46,6 +50,10 @@ abstract class BaseController extends Controller
     /**
      * @return void
      */
+
+    protected $admins;
+    protected $petugass;
+    protected $users;
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Do Not Edit This Line

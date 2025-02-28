@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\LoginModel;
+use App\Models\AuthModel;
 use CodeIgniter\Controller;
 
 class AuthController extends Controller
@@ -16,38 +16,64 @@ class AuthController extends Controller
     }
 
     public function attemptLogin()
-{
-    $session = session();
-    $model = new LoginModel();
+    {
+        $session = session();
+        $model = new AuthModel();
+        $db = \Config\Database::connect();
+        
+        $email = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
     
-    $email = $this->request->getPost('email');
-    $password = $this->request->getPost('password');
-
-    $user = $model->where('email', $email)->first();
-
-    if ($user) {
-
-        if (password_verify($password, $user['password'])) {
-            echo "Password cocok!<br>";
-
-            $session->set([
-                'user_id' => $user['id'],
-                'role' => $user['roles_id'],
-                'logged_in' => true
-            ]);
-
-            return redirect()->to($this->getDashboardRoute($user['roles_id']));
+        $user = $model->where('email', $email)->first();
+    
+        if ($user) {
+            if (password_verify($password, $user['password'])) {
+                echo "Password cocok!<br>";
+    
+                $nama = 'Guest'; 
+    
+                
+                if ($user['roles_id'] == 1) { 
+                    $result = $db->table('admin')
+                        ->select('admin.nama')
+                        ->where('users_id', $user['id'])
+                        ->get()
+                        ->getRowArray();
+                    if ($result) {
+                        $nama = $result['nama'];
+                    }
+                } elseif ($user['roles_id'] == 2 || $user['roles_id'] == 3) { 
+                    $result = $db->table('pengguna')
+                        ->select('pengguna.nama')
+                        ->where('users_id', $user['id'])
+                        ->get()
+                        ->getRowArray();
+                    if ($result) {
+                        $nama = $result['nama'];
+                    }
+                }
+    
+               
+                $session->set([
+                    'user_id' => $user['id'],
+                    'nama' => $nama, 
+                    'role' => $user['roles_id'],
+                    'logged_in' => true
+                ]);
+    
+                return redirect()->to($this->getDashboardRoute($user['roles_id']));
+            } else {
+                echo "Password tidak cocok!<br>";
+            }
         } else {
-            echo "Password tidak cocok!<br>";
+            echo "Email tidak ditemukan!<br>";
         }
-    } else {
-        echo "Email tidak ditemukan!<br>";
+    
+        return redirect()->back()->with('error', 'Maaf, Email atau Password Salah');
     }
+    
 
-    return redirect()->back()->with('error', 'Maaf Email Atau Password Salah');
-}
-
-    // Fungsi untuk menentukan dashboard berdasarkan role
+    
     private function getDashboardRoute($role)
     {
         switch ($role) {
