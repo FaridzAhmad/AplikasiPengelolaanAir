@@ -274,8 +274,7 @@
                 "paging": true,
                 "searching": true,
                 "ordering": true,
-                "info": true,
-                "lengthMenu": [10, 25, 50, 100]
+                "info": true
             });
         } else {
             console.error("Error: DataTables tidak ditemukan.");

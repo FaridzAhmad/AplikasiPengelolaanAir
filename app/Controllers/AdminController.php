@@ -79,13 +79,13 @@ class AdminController extends Controller
 
     public function pengumuman()
     {
-        $data['pengumuman'] = $this->pengumumanModel->findAll();
+        $data['pengumumans'] = $this->pengumumanModel->findAll();
         return view('admin/pengumuman', $data);
     }
 
     public function tambahPengumuman()
     {
-        return view('admin/form_pengumuman');
+        return view('admin/tambah_pengumuman');
     }
 
     public function simpanPengumuman()
@@ -93,7 +93,9 @@ class AdminController extends Controller
         $this->pengumumanModel->save([
             'judul' => $this->request->getPost('judul'),
             'isi' => $this->request->getPost('isi'),
-            'target' => $this->request->getPost('target'),
+            'target' => $this->request->getPost('target') ? implode(',', $this->request->getPost('target')) : 'pengguna,petugas',
+            'awal_berlaku' => date('Y-m-d', strtotime(str_replace('-', '/', $this->request->getPost('awal_berlaku')))),
+            'akhir_berlaku' => date('Y-m-d', strtotime(str_replace('-', '/', $this->request->getPost('akhir_berlaku'))))
         ]);
 
         return redirect()->to('/admin/pengumuman')->with('success', 'Pengumuman berhasil dibuat!');

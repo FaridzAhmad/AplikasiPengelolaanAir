@@ -7,7 +7,7 @@ class PengumumanModel extends Model
 {
     protected $table = 'pengumuman';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['judul', 'isi', 'target', 'created_at'];
+    protected $allowedFields = ['judul', 'isi', 'target', 'created_at', 'awal_berlaku', 'akhir_berlaku'];
 
     public function getPengumumanByTarget($target)
     {
