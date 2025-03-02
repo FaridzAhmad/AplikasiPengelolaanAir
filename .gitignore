@@ -126,8 +126,8 @@ nb-configuration.xml
 /phpunit*.xml
 
 # CodeIgniter 4
-writable/*
-!writable/index.html
+# writable/*
+# !writable/index.html
 .env
 *.log
 vendor/*
