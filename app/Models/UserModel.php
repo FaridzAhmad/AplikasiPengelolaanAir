@@ -19,6 +19,13 @@ class UserModel extends Model
         return $this->where('status_meteran', 'aktif')
                     ->findAll();
     }
+    public function getDataPengguna($userId)
+{
+    return $this->select('pengguna.*, users.email') // Pilih kolom yang ingin diambil
+                ->join('users', 'users.id = pengguna.users_id') // Join ke tabel users
+                ->where('pengguna.users_id', $userId) // Filter berdasarkan users_id
+                ->first(); // Ambil satu data
+}
 
 
 }

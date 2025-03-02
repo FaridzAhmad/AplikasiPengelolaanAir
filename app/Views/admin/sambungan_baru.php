@@ -44,11 +44,10 @@
             <td><?= esc($user['no_hp']); ?></td>
             <td>
                 <span class="badge bg-warning" style="color:white"><?= esc($user['status_meteran']); ?></span>
-            </form>
             </td>   
             <td>
             <form action="<?= base_url('/admin/update-status'); ?>" method="post">
-                <input type="hidden" name="id" value="<?= esc($user['id_meteran']); ?>">
+                <input type="hidden" name="id" value="<?= esc($user['id']); ?>">
                 <?php if ($user['status_meteran'] == 'belum aktif'): ?>
                     <button type="submit" name="status_meteran" value="aktif" class="btn btn-success btn-sm ms-2">
                         <i class="fa fa-check"></i>

@@ -4,7 +4,13 @@
 
 <?= $this->section('content') ?>
 
-<?= session()->getFlashdata('success'); ?>
+<?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success"><?= session()->getFlashdata('success'); ?></div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger"><?= session()->getFlashdata('error'); ?></div>
+    <?php endif; ?>
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">

@@ -28,6 +28,8 @@
             <th>RW</th>
             <th>Alamat</th>
             <th>No HP</th>
+            <th>Status  Meteran</th>
+            <th>Aksi</th>
         </tr>
     </thead>
     <tbody>
@@ -40,6 +42,57 @@
             <td><?= esc($pengguna['rw']); ?></td>
             <td><?= esc($pengguna['alamat']); ?></td>
             <td><?= esc($pengguna['no_hp']); ?></td>
+            <td>
+            <?php
+                $status = $pengguna['status_meteran'];
+                $badgeColor = 'bg-secondary'; // Default warna (jika status tidak dikenali)
+                $extraBadge = ''; // Badge tambahan jika pemutusan disetujui
+
+                if ($status == 'aktif') {
+                    $badgeColor = 'bg-success'; // Hijau untuk "aktif"
+                } elseif ($status == 'putus') {
+                    $badgeColor = 'bg-warning'; // Kuning untuk "putus"
+
+                    // Cek apakah id_meteran ada di tabel pemutusan dengan status "disetujui"
+                    $pemutusanModel = new \App\Models\PemutusanModel();
+                    $pemutusan = $pemutusanModel->where('id_meteran', $pengguna['id_meteran'])
+                                                ->where('status', 'disetujui')
+                                                ->first();
+
+                    if ($pemutusan) {
+                        $extraBadge = '<span class="badge bg-warning ms-2">Pengajuan Oleh Pengguna</span>'; // Badge tambahan jika disetujui
+                    }else{
+                        $extraBadge = '<span class="badge bg-warning ms-2">Diputus Admin</span>'; // Badge tambahan jika disetujui
+                    }
+                } elseif ($status == 'belum aktif') {
+                    $badgeColor = 'bg-danger'; // Merah untuk "belum aktif"
+                }
+                ?>
+
+                <span class="badge <?= $badgeColor; ?>" style="color: white;">
+                    <?= esc($status); ?>
+                </span>
+                <?= $extraBadge; ?>
+            </td>
+
+            <td>
+                <input type="hidden" name="id" value="<?= esc($pengguna['id_meteran']); ?>">
+
+                <a href="<?= base_url('/admin/detail/' . esc($pengguna['id_meteran'])); ?>" class="btn btn-info btn-sm">
+                    <i class="fa fa-eye"></i>
+                </a>
+
+                <?php if ($pengguna['status_meteran'] == 'aktif') : ?>
+                    <form action="<?= base_url('/admin/putus-sambungan'); ?>" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="<?= esc($pengguna['id']); ?>">
+                        <input type="hidden" name="status_meteran" value="putus">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin memutus sambungan ini?');">
+                            <i class="fa fa-power-off"></i> Putus
+                        </button>
+                    </form>
+                <?php endif; ?>
+
+            </td>
 
         </tr>
         <?php endforeach; ?>

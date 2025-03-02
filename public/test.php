@@ -1,3 +1,3 @@
 <?php
-echo password_hash('user', PASSWORD_DEFAULT);
+echo password_hash('eka', PASSWORD_DEFAULT);
 ?>

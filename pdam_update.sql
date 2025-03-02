@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 28, 2025 at 07:08 PM
+-- Generation Time: Mar 02, 2025 at 10:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,6 +48,28 @@ INSERT INTO `admin` (`id`, `users_id`, `nama`, `rt`, `rw`, `alamat`, `no_hp`, `f
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pemutusan`
+--
+
+CREATE TABLE `pemutusan` (
+  `id` int(11) NOT NULL,
+  `id_meteran` varchar(50) NOT NULL,
+  `alasan` text NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `status` enum('pending','disetujui') DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pemutusan`
+--
+
+INSERT INTO `pemutusan` (`id`, `id_meteran`, `alasan`, `created_at`, `status`) VALUES
+(1, '202502278321', 'Mahal', '2025-03-02 03:00:24', 'disetujui'),
+(2, '202502278501', 'Tidak Ramah', '2025-03-02 15:31:27', 'pending');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `pengguna`
 --
 
@@ -70,8 +92,13 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id`, `users_id`, `id_meteran`, `nik`, `nama`, `rt`, `rw`, `alamat`, `no_hp`, `foto`, `status_meteran`) VALUES
-(1, 4, '', '', 'Siti Aminah', '03', '04', '', '081298765432', NULL, 'belum aktif'),
-(7, 8, '202502278322', '33200510001000100', 'farid', '1', '1', 'Sukolilo ', '08954262902058', '1740678430_0d2b87f34e927c5ac386.png', 'belum aktif');
+(1, 4, '202502278321', '3320051000100003', 'Siti Aminah', '03', '04', 'Gembong', '081298765432', NULL, 'putus'),
+(7, 8, '202502278322', '33200510001000100', 'farid', '1', '1', 'Sukolilo ', '08954262902058', '1740678430_0d2b87f34e927c5ac386.png', 'aktif'),
+(8, 9, '202502274465', '3201010101010001', 'Ahmad Rozak', '01', '02', 'Jl. Merdeka No.1', '081234567890', 'ahmad.jpg', 'aktif'),
+(9, 10, '202502279297', '3201010101010002', 'Budi Santoso', '02', '03', 'Jl. Sudirman No.2', '081234567891', 'budi.jpg', 'aktif'),
+(10, 11, '202502273089', '3201010101010003', 'Citra Dewi', '03', '04', 'Jl. Diponegoro No.3', '081234567892', 'citra.jpg', 'belum aktif'),
+(11, 12, '202502277553', '3201010101010004', 'David Wijaya', '04', '05', 'Jl. Hasanuddin No.4', '081234567893', 'david.jpg', 'putus'),
+(12, 13, '202502278501', '3201010101010005', 'Eka Sari', '05', '06', 'Jl. Ahmad Yani No.5', '081234567894', 'eka.jpg', 'aktif');
 
 -- --------------------------------------------------------
 
@@ -83,9 +110,18 @@ CREATE TABLE `pengumuman` (
   `id` int(11) NOT NULL,
   `judul` varchar(255) NOT NULL,
   `isi` text NOT NULL,
-  `target` enum('semua','pengguna','petugas') NOT NULL DEFAULT 'semua',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `target` set('pengguna','petugas') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `awal_berlaku` date NOT NULL,
+  `akhir_berlaku` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pengumuman`
+--
+
+INSERT INTO `pengumuman` (`id`, `judul`, `isi`, `target`, `created_at`, `awal_berlaku`, `akhir_berlaku`) VALUES
+(12, 'Test', 'Test', 'pengguna,petugas', '2025-03-01 14:49:35', '2025-03-02', '2025-03-09');
 
 -- --------------------------------------------------------
 
@@ -150,7 +186,12 @@ INSERT INTO `users` (`id`, `email`, `password`, `roles_id`) VALUES
 (2, 'admin@gmail.com', '$2y$10$lj3WOc/2LAOeRRWR8pyfPO3dc7l9QxlzDg.ZTVrMdOwA6Cp5gMgMi', 1),
 (3, 'petugas@gmail.com', '$2y$10$L3fIe2tT8apphzWAVouq5e5TeWeiA5b4v1XgxwskIcyVHj.027WGu', 2),
 (4, 'user@gmail.com', '$2y$10$gNkrXLO4kw.HiFPeT.hnUuPGeeNLVYcJEzjvEQaSPmKEwwVp38BO6', 3),
-(8, 'farid@gmail.com', '$2y$10$F4iyQLMA/P5D7kw/VKXvK.1DEtYHOy.FSB/zCpgQwMb/OuOWIW/sC', 3);
+(8, 'farid@gmail.com', '$2y$10$F4iyQLMA/P5D7kw/VKXvK.1DEtYHOy.FSB/zCpgQwMb/OuOWIW/sC', 3),
+(9, 'ahmad@gmail.com', '$2y$10$tBuWqQd5kPqD66BrvuJtxOvMTKqVOJTG/M6i6jUJjoQ/cCYcsA7k.', 3),
+(10, 'budi@gmail.com', '$2y$10$HUbeQa/CqaBneLJYbXhhfORopHexEyJnNG4b3TlBv9178.vtne6XC', 3),
+(11, 'citra@gmail.com', '$2y$10$quXPwn/DKehKUsv4XtYRo.EMYx5cSr6DOpaNOhQzw0bJvBJt7pVeu', 3),
+(12, 'david@gmail.com', '$2y$10$T.aCH8UkQ4o8RcfK8K4Z4epE2mtIxAZ0EmbaG5KmhBOovmmEugSOu', 3),
+(13, 'eka@gmail.com', '$2y$10$Ya8FnTNGw/Hp7rQJFH8WreB9iZ.iadKhgjpopFm/Q4AFnoWomZY.6', 3);
 
 --
 -- Indexes for dumped tables
@@ -162,6 +203,12 @@ INSERT INTO `users` (`id`, `email`, `password`, `roles_id`) VALUES
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`id`),
   ADD KEY `users_id` (`users_id`);
+
+--
+-- Indexes for table `pemutusan`
+--
+ALTER TABLE `pemutusan`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `pengguna`
@@ -209,16 +256,22 @@ ALTER TABLE `admin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `pemutusan`
+--
+ALTER TABLE `pemutusan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `pengguna`
 --
 ALTER TABLE `pengguna`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `pengumuman`
 --
 ALTER TABLE `pengumuman`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `petugas`
@@ -236,7 +289,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables

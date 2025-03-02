@@ -21,8 +21,20 @@ $routes->get('/admin/sambungan-baru', 'AdminController::belumAktif');
 $routes->get('/admin/pengumuman', 'AdminController::pengumuman');
 $routes->get('/admin/pengumuman/tambah', 'AdminController::tambahPengumuman');
 $routes->post('/admin/pengumuman/simpan', 'AdminController::simpanPengumuman');
+$routes->get('admin/detail/(:num)', 'AdminController::detail/$1');
+$routes->post('/admin/putus-sambungan', 'AdminController::putusSambungan');
+$routes->get('/admin/pemutusan', 'AdminController::pemutusan');
+$routes->post('/admin/acc-pemutusan', 'AdminController::accPemutusan', ['filter' => 'auth']);
+
 
 
 
 $routes->get('/user/dashboard', 'UserController::index', ['filter' => 'auth']);
+$routes->get('/user/putus-sambungan', 'UserController::putusSambungan', ['filter' => 'auth']);
+$routes->post('/user/ajukan-pemutusan', 'UserController::ajukanPemutusan', ['filter' => 'auth']);
+
+
+
+
+
 $routes->get('/petugas/dashboard', 'PetugasController::index', ['filter' => 'auth']);
