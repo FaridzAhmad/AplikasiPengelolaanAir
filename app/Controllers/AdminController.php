@@ -7,6 +7,7 @@ use App\Models\AdminModel;
 use App\Models\UserModel;
 use App\Models\PengumumanModel;
 use App\Models\PemutusanModel;
+use App\Models\keluhanModel;
 
 class AdminController extends Controller
 {
@@ -154,14 +155,12 @@ class AdminController extends Controller
         $pemutusanModel = new PemutusanModel();
         $penggunaModel = new UserModel();
 
-        $id = $this->request->getPost('id'); // ID dari tabel pemutusan
-        $idMeteran = $this->request->getPost('id_meteran'); // ID Meteran
+        $id = $this->request->getPost('id'); 
+        $idMeteran = $this->request->getPost('id_meteran'); 
 
         if ($idMeteran) {
-            // Update status pemutusan jadi "disetujui"
             $pemutusanModel->where('id_meteran', $idMeteran)->set(['status' => 'disetujui'])->update();
 
-            // Update status pengguna jadi "putus"
             $penggunaModel->where('id_meteran', $idMeteran)->set(['status_meteran' => 'putus'])->update();
 
             return redirect()->to('/admin/pemutusan')->with('success', 'Pemutusan disetujui!');
@@ -170,5 +169,46 @@ class AdminController extends Controller
         return redirect()->to('/admin/pemutusan')->with('error', 'Gagal menyetujui pemutusan.');
     }
 
+    public function listKeluhan()
+    {
+        $keluhanModel = new KeluhanModel();
+        $data['keluhan'] = $keluhanModel->getAllKeluhan(); 
+        return view('admin/keluhan', $data);
+    }
+
+    public function detailKeluhan($id)
+    {
+        $keluhanModel = new KeluhanModel();
+        $petugasModel = new PetugasModel();
+
+        $data['keluhan'] = $keluhanModel->getKeluhanById($id);
+        $data['petugas'] = $petugasModel->findAll(); 
+
+        if (!$data['keluhan']) {
+            return redirect()->to('/admin/keluhan')->with('error', 'Keluhan tidak ditemukan.');
+        }
+
+        return view('admin/detail_keluhan', $data);
+    }
+
+    public function updateKeluhan()
+    {
+        $keluhanModel = new KeluhanModel();
+
+        $id = $this->request->getPost('id');
+        $status = $this->request->getPost('status');
+        $petugas = $this->request->getPost('petugas');
+
+        if ($id) {
+            $keluhanModel->update($id, [
+                'status' => $status,
+                'petugas' => $petugas
+            ]);
+
+            return redirect()->to('/admin/keluhan')->with('success', 'Status keluhan berhasil diperbarui.');
+        }
+
+        return redirect()->to('/admin/keluhan')->with('error', 'Gagal memperbarui keluhan.');
+    }
 
 }

@@ -25,6 +25,9 @@ $routes->get('admin/detail/(:num)', 'AdminController::detail/$1');
 $routes->post('/admin/putus-sambungan', 'AdminController::putusSambungan');
 $routes->get('/admin/pemutusan', 'AdminController::pemutusan');
 $routes->post('/admin/acc-pemutusan', 'AdminController::accPemutusan', ['filter' => 'auth']);
+$routes->get('/admin/keluhan', 'AdminController::listKeluhan', ['filter' => 'auth']);
+$routes->get('/admin/keluhan/(:num)', 'AdminController::detailKeluhan/$1', ['filter' => 'auth']);
+$routes->post('/admin/keluhan/update', 'AdminController::updateKeluhan', ['filter' => 'auth']);
 
 
 
@@ -32,6 +35,8 @@ $routes->post('/admin/acc-pemutusan', 'AdminController::accPemutusan', ['filter'
 $routes->get('/user/dashboard', 'UserController::index', ['filter' => 'auth']);
 $routes->get('/user/putus-sambungan', 'UserController::putusSambungan', ['filter' => 'auth']);
 $routes->post('/user/ajukan-pemutusan', 'UserController::ajukanPemutusan', ['filter' => 'auth']);
+$routes->get('/user/keluhan', 'UserController::formKeluhan', ['filter' => 'auth']);
+$routes->post('/user/keluhan/simpan', 'UserController::simpanKeluhan', ['filter' => 'auth']);
 
 
 

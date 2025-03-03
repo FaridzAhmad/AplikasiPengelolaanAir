@@ -90,7 +90,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item <?= (uri_string() == 'admin/sambungan-baru') ? 'active' : '' ?>" href="<?= base_url('admin/sambungan-baru') ?>">Sambungan Baru</a>
                         <a class="collapse-item <?= (uri_string() == 'admin/pemutusan') ? 'active' : '' ?>" href="<?= base_url('admin/pemutusan') ?>">Pemutusan Sambungan</a>
-                        <a class="collapse-item <?= (uri_string() == 'admin/perbaikan') ? 'active' : '' ?>" href="<?= base_url('admin/perbaikan') ?>">Perbaikan Sambungan</a>
+                        <!-- <a class="collapse-item <?= (uri_string() == 'admin/perbaikan') ? 'active' : '' ?>" href="<?= base_url('admin/perbaikan') ?>">Perbaikan Sambungan</a> -->
                         <a class="collapse-item <?= (uri_string() == 'admin/keluhan') ? 'active' : '' ?>" href="<?= base_url('admin/keluhan') ?>">Keluhan Pelanggan</a>
                         <a class="collapse-item <?= (uri_string() == 'admin/pembayaran') ? 'active' : '' ?>" href="<?= base_url('admin/pembayaran') ?>">Pembayaran Online</a>
                     </div>
