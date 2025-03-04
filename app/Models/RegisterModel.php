@@ -7,5 +7,5 @@ class RegisterModel extends Model
 {
     protected $table = 'users'; 
     protected $primaryKey = 'id';
-    protected $allowedFields = ['email', 'password', 'roles_id'];
+    protected $allowedFields = ['id','email', 'password', 'roles_id'];
 }

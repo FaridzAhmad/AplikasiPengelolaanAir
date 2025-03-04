@@ -21,19 +21,45 @@ class RegisterController extends Controller
         $registerModel = new RegisterModel(); 
         $db = \Config\Database::connect();
 
-        
+        $nik = $this->request->getPost('nik');
+        $existingUser = $userModel->where('nik', $nik)->first();
+
+        if ($existingUser) {
+            return redirect()->back()->with('error', 'NIK sudah terdaftar!')->withInput();
+        }
+
+        $db->query('SET FOREIGN_KEY_CHECKS = 0;');
+
+        $tahun = date('Y');
+
+        $lastUser = $registerModel
+            ->select('id')
+            ->where('roles_id', 3)
+            ->like('id', "PENGGUNA-$tahun-", 'after')
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if ($lastUser) {
+            $lastNumber = (int) substr($lastUser['id'], -4); 
+            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT); 
+        } else {
+            $newNumber = '0001'; 
+        }
+
+        $newUserId = "PENGGUNA-$tahun-$newNumber";
+
         $userData = [
+            'id' => $newUserId,
             'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
             'roles_id' => 3,
         ];
-        $registerModel->insert($userData);
-        $userId = $registerModel->insertID();
+        $registerModel->insert($userData); 
 
         $penggunaData = [
             'id_meteran' => $this->generateUniqueID($db),
-            'users_id' => $userId,
-            'nik' => $this->request->getPost('nik'),
+            'users_id' => $newUserId, 
+            'nik' => $nik,
             'nama' => $this->request->getPost('nama'),
             'rt' => $this->request->getPost('rt'),
             'rw' => $this->request->getPost('rw'),
@@ -52,6 +78,8 @@ class RegisterController extends Controller
         }
 
         $userModel->insert($penggunaData);
+
+        $db->query('SET FOREIGN_KEY_CHECKS = 1;');
 
         return redirect()->to('/login')->with('success', 'Registrasi berhasil!');
     }
