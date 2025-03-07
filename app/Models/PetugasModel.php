@@ -6,7 +6,7 @@ class PetugasModel extends Model
 {
     protected $table = 'petugas'; 
     protected $primaryKey = 'id';
-    protected $allowedFields = ['users_id', 'nama', 'alamat', 'no_hp', 'foto'];
+    protected $allowedFields = ['users_id', 'nama', 'alamat', 'no_hp', 'foto', 'jobdesk'];
 
     // public function getPetugasName()
     // {

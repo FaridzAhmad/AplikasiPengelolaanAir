@@ -10,8 +10,6 @@
     </div>
     <div class="card-body">
     <form action="<?= base_url('/admin/petugas/simpan') ?>" method="post" enctype="multipart/form-data">
-    <h6 class="text-primary">Data Petugas</h6>
-
     <div class="mb-3">
         <label class="form-label">Nama Petugas</label>
         <input type="text" name="nama_petugas" class="form-control" required>
@@ -25,6 +23,14 @@
     <div class="mb-3">
         <label class="form-label">No HP</label>
         <input type="text" name="no_hp_petugas" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Jobdesk</label>
+        <div>
+            <input type="checkbox" name="jobdesk[]" value="petugas"> Petugas
+            <input type="checkbox" name="jobdesk[]" value="teknisi"> Teknisi
+        </div>
     </div>
 
     <div class="mb-3">

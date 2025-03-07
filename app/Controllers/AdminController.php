@@ -280,13 +280,18 @@ class AdminController extends Controller
             $foto->move('uploads/petugas/', $newName);
         }
 
+        $jobdesk = $this->request->getPost('jobdesk'); 
+        $jobdeskString = is_array($jobdesk) ? implode(',', $jobdesk) : ''; 
+        
         $petugasData = [
             'users_id' => $newPetugasId, 
             'nama' => $this->request->getPost('nama_petugas'),
             'alamat' => $this->request->getPost('alamat_petugas'),
             'no_hp' => $this->request->getPost('no_hp_petugas'),
             'foto' => $newName,
+            'jobdesk' => $jobdeskString, 
         ];
+        
         $petugasModel->insert($petugasData);
 
         $db->transComplete(); 
