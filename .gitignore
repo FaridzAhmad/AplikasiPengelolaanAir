@@ -131,3 +131,4 @@ nb-configuration.xml
 .env
 *.log
 vendor/*
+!public/assets/vendor/
