@@ -24,15 +24,6 @@
         <label class="form-label">No HP</label>
         <input type="text" name="no_hp_petugas" class="form-control" required>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Jobdesk</label>
-        <div>
-            <input type="checkbox" name="jobdesk[]" value="petugas"> Petugas
-            <input type="checkbox" name="jobdesk[]" value="teknisi"> Teknisi
-        </div>
-    </div>
-
     <div class="mb-3">
         <label class="form-label">Foto</label>
         <input type="file" name="foto_petugas" class="form-control" required>

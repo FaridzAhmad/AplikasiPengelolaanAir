@@ -13,10 +13,17 @@
     <?php endif; ?>
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">Daftar Petugas</h6>
-        <a href="<?= base_url('/admin/petugas/tambah') ?>" class="btn btn-primary">Tambah Petugas</a>
+    <div class="card-header py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Daftar Petugas</h6>
+            <div>
+                <a href="<?= base_url('/admin/petugas/tambah') ?>" class="btn btn-primary btn-sm">Tambah Petugas</a>
+                <a href="<?= base_url('/admin/teknisi/tambah') ?>" class="btn btn-warning btn-sm">Tambah Teknisi</a>
+            </div>
+        </div>
     </div>
+
+
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered" id="dataCustomer" class="display" width="100%" cellspacing="0">
@@ -28,6 +35,7 @@
                         <th>Nama Petugas</th>
                         <th>Alamat</th>
                         <th>No Hp</th>
+                        <th>Jobdesk</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -36,16 +44,20 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td>
-                                <img src="<?= base_url('uploads/petugas/' . esc($p['foto'])) ?>" alt="Foto Petugas" width="100">
+                            <img src="<?= base_url(($p['role'] === 'Teknisi' ? 'uploads/teknisi/' : 'uploads/petugas/') . esc($p['foto'])) ?>" 
+                                alt="Foto <?= esc($p['nama']) ?>" width="100">
                             </td>
                             <td><?= esc($p['users_id']) ?></td>
                             <td><?= esc($p['nama']) ?></td>
                             <td><?= esc($p['alamat']) ?></td>
                             <td><?= esc($p['no_hp']) ?></td>
+                            <td><?= esc($p['role']) ?></td>
                             <td>
-                                <a href="<?= base_url('/admin/petugas/' . esc($p['users_id'])) ?>" class="btn btn-info btn-sm">
-                                    <i class="fa fa-eye"></i> Lihat
-                                </a>
+                            <a href="<?= base_url('/admin/' . ($p['role'] === 'Teknisi' ? 'teknisi' : 'petugas') . '/' . esc($p['users_id'])) ?>" 
+                            class="btn btn-info btn-sm">
+                                <i class="fa fa-eye"></i> Lihat
+                            </a>
+
                             </td>
                         </tr>
                     <?php endforeach; ?>

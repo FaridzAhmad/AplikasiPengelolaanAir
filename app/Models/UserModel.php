@@ -20,12 +20,12 @@ class UserModel extends Model
                     ->findAll();
     }
     public function getDataPengguna($userId)
-{
-    return $this->select('pengguna.*, users.email') 
-                ->join('users', 'users.id = pengguna.users_id') 
-                ->where('pengguna.users_id', $userId) 
-                ->first(); 
-}
+    {
+        return $this->select('pengguna.*, users.email') 
+                    ->join('users', 'users.id = pengguna.users_id') 
+                    ->where('pengguna.users_id', $userId) 
+                    ->first(); 
+    }
 
 
 }

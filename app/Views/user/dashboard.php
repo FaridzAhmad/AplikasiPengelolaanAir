@@ -73,10 +73,19 @@
 
             <!-- Nav Item - Data Pelanggan -->
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-file-invoice-dollar"></i>
-                    <span>Tagihan</span></a>
+                <?php if ($pengguna['status_meteran'] == 'aktif'): ?>
+                    <a class="nav-link" href="<?= base_url('/user/tagihan'); ?>">
+                        <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                        <span>Tagihan</span>
+                    </a>
+                <?php else: ?>
+                    <a class="nav-link" href="<?= base_url('/user/tagihan-awal'); ?>">
+                        <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                        <span>Tagihan Awal</span>
+                    </a>
+                <?php endif; ?>
             </li>
+
 
             <li class="nav-item <?= (current_url() == base_url('user/putus-sambungan')) ? 'active' : '' ?>">
                 <a class="nav-link" href="<?= base_url('user/putus-sambungan') ?>">

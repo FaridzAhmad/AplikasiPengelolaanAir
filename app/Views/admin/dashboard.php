@@ -92,24 +92,25 @@
                     <i class="fas fa-fw fa-file-signature"></i>
                     <span>Data Pengajuan</span>
                 </a>
-                <div id="collapseTwo" class="collapse <?= (in_array(uri_string(), ['admin/sambungan-baru', 'admin/pemutusan', 'admin/perbaikan', 'admin/keluhan', 'admin/pembayaran'])) ? 'show' : '' ?>" 
+                <div id="collapseTwo" class="collapse <?= (in_array(uri_string(), ['admin/sambungan-baru', 'admin/pemutusan', 'admin/perbaikan', 'admin/keluhan', 'admin/pembayaran-registrasi','admin/pembayaran-bulanan'])) ? 'show' : '' ?>" 
                     aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item <?= (uri_string() == 'admin/sambungan-baru') ? 'active' : '' ?>" href="<?= base_url('admin/sambungan-baru') ?>">Sambungan Baru</a>
                         <a class="collapse-item <?= (uri_string() == 'admin/pemutusan') ? 'active' : '' ?>" href="<?= base_url('admin/pemutusan') ?>">Pemutusan Sambungan</a>
                         <!-- <a class="collapse-item <?= (uri_string() == 'admin/perbaikan') ? 'active' : '' ?>" href="<?= base_url('admin/perbaikan') ?>">Perbaikan Sambungan</a> -->
                         <a class="collapse-item <?= (uri_string() == 'admin/keluhan') ? 'active' : '' ?>" href="<?= base_url('admin/keluhan') ?>">Keluhan Pelanggan</a>
-                        <a class="collapse-item <?= (uri_string() == 'admin/pembayaran') ? 'active' : '' ?>" href="<?= base_url('admin/pembayaran') ?>">Pembayaran Online</a>
+                        <a class="collapse-item <?= (uri_string() == 'admin/pembayaran-registrasi') ? 'active' : '' ?>" href="<?= base_url('admin/pembayaran-registrasi') ?>">Pembayaran Registrasi</a>
+                        <a class="collapse-item <?= (uri_string() == 'admin/pembayaran-bulanan') ? 'active' : '' ?>" href="<?= base_url('admin/pembayaran-bulanan') ?>">Pembayaran Bulanan</a>
                     </div>
                 </div>
             </li>
 
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link" href="tables.html">
                     <i class="fas fa-credit-card"></i>
                     <span>Data Pembayaran</span></a>
-            </li>
+            </li> -->
 
             <li class="nav-item">
                 <a class="nav-link" href="tables.html">

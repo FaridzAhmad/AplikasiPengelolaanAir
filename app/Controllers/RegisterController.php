@@ -3,6 +3,7 @@
 namespace App\Controllers;
 use App\Models\RegisterModel;
 use App\Models\UserModel;
+use App\Models\TransaksiAwalModel;
 use CodeIgniter\Controller;
 
 class RegisterController extends Controller
@@ -19,6 +20,7 @@ class RegisterController extends Controller
     {
         $userModel = new UserModel(); 
         $registerModel = new RegisterModel(); 
+        $transaksiModel = new TransaksiAwalModel(); 
         $db = \Config\Database::connect();
 
         $nik = $this->request->getPost('nik');
@@ -56,8 +58,10 @@ class RegisterController extends Controller
         ];
         $registerModel->insert($userData); 
 
+        $id_meteran = $this->generateUniqueID($db);
+
         $penggunaData = [
-            'id_meteran' => $this->generateUniqueID($db),
+            'id_meteran' => $id_meteran,
             'users_id' => $newUserId, 
             'nik' => $nik,
             'nama' => $this->request->getPost('nama'),
@@ -78,6 +82,17 @@ class RegisterController extends Controller
         }
 
         $userModel->insert($penggunaData);
+
+        $transaksiData = [
+            'id_meteran' => $id_meteran,
+            'status_bayar' => 'belum bayar',
+            'bukti_bayar' => null,
+            'tanggal_pembayaran' => null,
+            'nominal' => 500000, 
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        $transaksiModel->insert($transaksiData);
 
         $db->query('SET FOREIGN_KEY_CHECKS = 1;');
 

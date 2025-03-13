@@ -6,6 +6,8 @@ use CodeIgniter\Controller;
 use App\Models\UserModel;
 use App\Models\PemutusanModel;
 use App\Models\KeluhanModel;
+use App\Models\TransaksiAwalModel;
+
 
 class UserController extends Controller
 {
@@ -33,7 +35,23 @@ class UserController extends Controller
         // $this->user = $userModel->getUserName($userId);
 
         // // 
-        return view('user/dashboard');
+
+
+        $userId = session('user_id'); 
+
+        $userModel = new UserModel();
+        $pengguna = $userModel->select('pengguna.*, users.email')
+            ->join('users', 'users.id = pengguna.users_id')
+            ->where('users.id', $userId)
+            ->first();
+    
+        if (!$pengguna) {
+            return redirect()->to('/login')->with('error', 'Data pengguna tidak ditemukan.');
+        }
+    
+        $data['pengguna'] = $pengguna;
+        // dd($data);
+        return view('user/dashboard', $data);
     }
 
     public function putusSambungan()
@@ -149,6 +167,53 @@ class UserController extends Controller
         return redirect()->to('/user/keluhan')->with('success', 'Keluhan berhasil dikirim.');
     }
 
+    public function konfirmasiPembayaranAwal()
+    {
+        $transaksiModel = new TransaksiAwalModel();
+        $request = $this->request;
+
+        $id_meteran = $request->getPost('id_meteran');
+
+        $transaksi = $transaksiModel->where('id_meteran', $id_meteran)->first();
+        if (!$transaksi) {
+            return redirect()->back()->with('error', 'Data transaksi tidak ditemukan.');
+        }
+        $bukti = $request->getFile('bukti_bayar');
+        if (!$bukti->isValid() || $bukti->hasMoved()) {
+            return redirect()->back()->with('error', 'Gagal mengunggah bukti pembayaran.');
+        }
+
+        $fileName = 'bukti_' . $id_meteran . '_' . time() . '.' . $bukti->getExtension();
+
+        $bukti->move('uploads/bukti_bayar', $fileName);
+
+        $transaksiModel->where('id_meteran', $id_meteran)->set([
+            'bukti_bayar' => 'uploads/bukti_bayar/' . $fileName,
+            'tanggal_pembayaran' => date('Y-m-d H:i:s'),
+            'status_bayar' => 'sudah bayar'
+        ])->update();
+
+        return redirect()->back()->with('success', 'Bukti pembayaran berhasil dikirim.');
+    }
+
+    public function tagihanAwal()
+    {
+        $userId = session('user_id'); 
+
+        $userModel = new UserModel();
+        $pengguna = $userModel->select('pengguna.*, users.email, transaksi_awal.nominal, transaksi_awal.status_bayar, transaksi_awal.bukti_bayar, transaksi_awal.tanggal_pembayaran')
+            ->join('users', 'users.id = pengguna.users_id')
+            ->join('transaksi_awal', 'transaksi_awal.id_meteran = pengguna.id_meteran', 'left') 
+            ->where('users.id', $userId)
+            ->first();
+
+        if (!$pengguna) {
+            return redirect()->to('/login')->with('error', 'Data pengguna tidak ditemukan.');
+        }
+
+        $data['pengguna'] = $pengguna;
+        return view('user/tagihan_awal', $data);
+    }
 
 }
 

@@ -6,7 +6,7 @@ class PetugasModel extends Model
 {
     protected $table = 'petugas'; 
     protected $primaryKey = 'id';
-    protected $allowedFields = ['users_id', 'nama', 'alamat', 'no_hp', 'foto', 'jobdesk'];
+    protected $allowedFields = ['users_id', 'nama', 'alamat', 'no_hp', 'foto'];
 
     // public function getPetugasName()
     // {
@@ -25,4 +25,14 @@ class PetugasModel extends Model
     {
         return $this->insert($data);
     }
+
+    public function getAllPetugas()
+    {
+        return $this->db->query("
+            SELECT users_id, nama, alamat, no_hp, foto, 'Petugas' as role FROM petugas
+            UNION 
+            SELECT users_id, nama, alamat, no_hp, foto, 'Teknisi' as role FROM teknisi
+        ")->getResultArray();
+    }
+
 }

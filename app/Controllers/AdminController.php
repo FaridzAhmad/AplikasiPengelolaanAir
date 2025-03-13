@@ -9,7 +9,12 @@ use App\Models\PengumumanModel;
 use App\Models\PemutusanModel;
 use App\Models\keluhanModel;
 use App\Models\PetugasModel;
+use App\Models\TeknisiModel;
 use App\Models\RegisterModel;
+use App\Models\SurveyAwalModel;
+use App\Models\TransaksiAwalModel;
+use App\Models\InvoiceModel;
+use App\Models\TransaksiModel;
 
 class AdminController extends Controller
 {
@@ -45,7 +50,6 @@ class AdminController extends Controller
         // 
         // $this->admins = $adminModel->getAdminName($adminId);
 
-        // // Kirim data ke view dashboard
         return view('admin/dashboard', ['admins' => $this->admins]);
     }
 
@@ -57,36 +61,35 @@ class AdminController extends Controller
             'penggunas' => $pengguna
         ]);
     }
-
-    public function updateStatus()
-    {
-        $penggunaModel = new UserModel(); 
-        $id = $this->request->getPost('id'); 
-        $status = $this->request->getPost('status_meteran');
-    
-       
-        if (!empty($id) && !empty($status)) {
-            $user = $penggunaModel->find($id);
-            if ($user) {
-                $penggunaModel->update($id, ['status_meteran' => $status]);
-                return redirect()->to('/admin/customer')->with('success', 'Status berhasil diperbarui.');
-            } else {
-                return redirect()->to('/admin/customer')->with('error', 'ID tidak ditemukan.');
-            }
-        }
-    
-        return redirect()->to('/admin/customer')->with('error', 'Gagal memperbarui status.');
-    }
-    
+   
     
     public function belumAktif()
     {
-        $penggunaModel = new UserModel();
-        $data['users'] = $penggunaModel->getBelumAktif();
+        $penggunaModel = new UserModel(); 
+        $surveyModel = new SurveyAwalModel(); 
+        $petugasModel = new PetugasModel(); 
 
-        return view('admin/sambungan_baru', $data);
+        $users = $penggunaModel->getBelumAktif();
+        
+        $petugas = $petugasModel->findAll(); 
 
+        foreach ($users as &$user) {
+            $survey = $surveyModel->getSurveyWithPetugas($user['id_meteran']);
+            $user['petugas'] = $survey['nama_petugas'] ?? null;
+            $user['status_survey'] = $survey['status'] ?? 'belum disurvey';
+        }
+        
+
+        // dd($users); 
+
+        return view('admin/sambungan_baru', [
+            'users' => $users,
+            'petugas' => $petugas
+        ]);
     }
+
+
+
 
     public function pengumuman()
     {
@@ -217,16 +220,21 @@ class AdminController extends Controller
     {
         return view('admin/tambah_petugas'); 
     }
+    public function tambahTeknisi()
+    {
+        return view('admin/tambah_teknisi'); 
+    }
 
     public function petugas()
     {
         $petugasModel = new PetugasModel();
-        $data['petugas'] = $petugasModel->findAll();
+        $data['petugas'] = $petugasModel->getAllPetugas(); 
 
         // dd($data);
-        return view ('admin/petugas', $data);
-
+        return view('admin/petugas', $data);
     }
+
+
     public function detailPetugas($id)
     {
         $petugasModel = new PetugasModel();
@@ -280,8 +288,8 @@ class AdminController extends Controller
             $foto->move('uploads/petugas/', $newName);
         }
 
-        $jobdesk = $this->request->getPost('jobdesk'); 
-        $jobdeskString = is_array($jobdesk) ? implode(',', $jobdesk) : ''; 
+        // $jobdesk = $this->request->getPost('jobdesk'); 
+        // $jobdeskString = is_array($jobdesk) ? implode(',', $jobdesk) : ''; 
         
         $petugasData = [
             'users_id' => $newPetugasId, 
@@ -289,7 +297,7 @@ class AdminController extends Controller
             'alamat' => $this->request->getPost('alamat_petugas'),
             'no_hp' => $this->request->getPost('no_hp_petugas'),
             'foto' => $newName,
-            'jobdesk' => $jobdeskString, 
+            // 'jobdesk' => $jobdeskString, 
         ];
         
         $petugasModel->insert($petugasData);
@@ -299,5 +307,204 @@ class AdminController extends Controller
         return redirect()->to('/admin/petugas')->with('success', 'Petugas berhasil ditambahkan.');
     }
 
+    public function simpanTeknisi()
+    {
+        $userModel = new RegisterModel(); 
+        $teknisiModel = new TeknisiModel();
+        $db = \Config\Database::connect();
+
+        $db->transStart(); 
+
+        $tahun = date('Y'); 
+
+        $lastTeknisi = $teknisiModel
+            ->select('users_id')
+            ->like('users_id', "TEKNISI-$tahun-", 'after')
+            ->orderBy('users_id', 'DESC')
+            ->first();
+
+        if ($lastTeknisi) {
+            $lastNumber = (int) substr($lastTeknisi['users_id'], -4); 
+            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            $newNumber = '0001';
+        }
+
+        $newteknisiId = "TEKNISI-$tahun-$newNumber";
+
+        $userData = [
+            'id' => $newteknisiId,
+            'email' => $this->request->getPost('email'),
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
+            'roles_id' => 4, 
+        ];
+        $userModel->insert($userData);
+
+        $foto = $this->request->getFile('foto_petugas');
+        $newName = null;
+        if ($foto->isValid() && !$foto->hasMoved()) {
+            $newName = $foto->getRandomName();
+            $foto->move('uploads/teknisi/', $newName);
+        }
+
+        // $jobdesk = $this->request->getPost('jobdesk'); 
+        // $jobdeskString = is_array($jobdesk) ? implode(',', $jobdesk) : ''; 
+        
+        $teknisiData = [
+            'users_id' => $newteknisiId, 
+            'nama' => $this->request->getPost('nama_petugas'),
+            'alamat' => $this->request->getPost('alamat_petugas'),
+            'no_hp' => $this->request->getPost('no_hp_petugas'),
+            'foto' => $newName,
+            // 'jobdesk' => $jobdeskString, 
+        ];
+        
+        $teknisiModel->insert($teknisiData);
+
+        $db->transComplete(); 
+
+        return redirect()->to('/admin/petugas')->with('success', 'Petugas berhasil ditambahkan.');
+    }
+
+    public function detailTeknisi($id)
+    {
+        $teknisiModel = new TeknisiModel();
+        $data['teknisi'] = $teknisiModel->getTeknisiById($id); 
+    
+        if (empty($data['teknisi'])) {
+            return redirect()->to('/admin/petugas')->with('error', 'Data Petugas tidak ditemukan.');
+        }
+        // dd($data);
+        return view('admin/detail_teknisi', $data);
+    }
+
+
+    public function kirimPetugas()
+    {
+        // dd($this->request->getPost());
+    
+        $surveyModel = new SurveyAwalModel();
+    
+        $data = [
+            'id_meteran'       => $this->request->getPost('id_meteran'),
+            'petugas'          => $this->request->getPost('petugas_id'),
+            'tanggal_penugasan' => date('Y-m-d'),
+            'status'           => 'belum disurvey'
+        ];
+    
+        $penggunaModel = new UserModel();
+        $pengguna = $penggunaModel->where('id_meteran', $data['id_meteran'])->first();
+    
+        if (!$pengguna) {
+            return redirect()->back()->with('error', 'Pengguna tidak ditemukan.');
+        }
+    
+        $surveyModel->insert($data);
+    
+        return redirect()->back()->with('success', 'Petugas berhasil dikirim.');
+    }
+
+    // public function updateStatus()
+    // {
+    //     $penggunaModel = new UserModel(); 
+    //     $id = $this->request->getPost('id'); 
+    //     $status = $this->request->getPost('status_meteran');
+    
+       
+    //     if (!empty($id) && !empty($status)) {
+    //         $user = $penggunaModel->find($id);
+    //         if ($user) {
+    //             $penggunaModel->update($id, ['status_meteran' => $status]);
+    //             return redirect()->to('/admin/customer')->with('success', 'Status berhasil diperbarui.');
+    //         } else {
+    //             return redirect()->to('/admin/customer')->with('error', 'ID tidak ditemukan.');
+    //         }
+    //     }
+    
+    //     return redirect()->to('/admin/customer')->with('error', 'Gagal memperbarui status.');
+    // }
+
+    public function pembayaranRegistrasi()
+    {
+        $transaksiModel = new TransaksiAwalModel();
+        $data['transaksi'] = $transaksiModel->getTransaksiWithPengguna();
+
+        // dd($data);
+        return view('admin/pembayaran_awal', $data);
+    }
+
+    public function konfirmasiPembayaran($id_meteran)
+{
+    $transaksiModel = new TransaksiAwalModel();
+    $penggunaModel = new UserModel();
+    $surveyModel = new SurveyAwalModel();
+    $invoiceModel = new InvoiceModel();
+    $transaksiBulananModel = new TransaksiModel(); 
+
+    $transaksi = $transaksiModel->where('id_meteran', $id_meteran)->first();
+
+    if (!$transaksi) {
+        return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
+    }
+
+    $bukti_bayar = $transaksi['bukti_bayar'];
+    $survey = $surveyModel->where('id_meteran', $id_meteran)->first();
+    $tanggal_pembayaran = $survey ? $survey['tanggal_survey'] : date('Y-m-d');
+
+    $bulan = date('m');
+    $tahun = date('Y');
+    $invoice_id = "INVOICE-{$id_meteran}-{$bulan}{$tahun}";
+
+    $transaksiModel->where('id_meteran', $id_meteran)->set([
+        'status_bayar' => 'sudah bayar',
+        'tanggal_pembayaran' => date('Y-m-d H:i:s')
+    ])->update();
+
+    $penggunaModel->where('id_meteran', $id_meteran)->set([
+        'status_meteran' => 'aktif'
+    ])->update();
+    
+    // dd([
+    //     'id_meteran' => $id_meteran,
+    //     'invoice' => $invoice_id,
+    //     'meteran_awal' => 0,
+    //     'meteran_akhir' => 0,
+    //     'jumlah_pakai' => 0,
+    //     'jumlah_tagihan' => 0,
+    //     'periode_bulan' => $bulan,
+    //     'periode_tahun' => $tahun,
+    //     'created_at' => date('Y-m-d H:i:s'),
+    //     'updated_at' => date('Y-m-d H:i:s')
+    // ]);
+    $transaksiBulananModel->insert([
+        'id_meteran' => $id_meteran,
+        'invoice' => $invoice_id,  
+        'meteran_awal' => 0,
+        'meteran_akhir' => 0,
+        'jumlah_pakai' => 0,
+        'jumlah_tagihan' => 0,
+        'periode_bulan' => $bulan,
+        'periode_tahun' => $tahun,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+
+    $cekTransaksi = $transaksiBulananModel->where('invoice', $invoice_id)->first();
+    if (!$cekTransaksi) {
+        return redirect()->back()->with('error', 'Gagal menambahkan transaksi bulanan.');
+    }
+
+    $invoiceModel->insert([
+        'invoice' => $invoice_id,
+        'jumlah_tagihan' => 0,
+        'status_bayar' => 'Lunas',
+        'tanggal_pembayaran' => $tanggal_pembayaran,
+        'bukti_bayar' => $bukti_bayar,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+
+    return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi dan transaksi bulanan dibuat.');
+}
 
 }
