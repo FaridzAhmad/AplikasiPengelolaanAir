@@ -45,27 +45,26 @@
             <td>
             <?php
                 $status = $pengguna['status_meteran'];
-                $badgeColor = 'bg-secondary'; // Default warna (jika status tidak dikenali)
-                $extraBadge = ''; // Badge tambahan jika pemutusan disetujui
+                $badgeColor = 'bg-secondary'; 
+                $extraBadge = ''; 
 
                 if ($status == 'aktif') {
-                    $badgeColor = 'bg-success'; // Hijau untuk "aktif"
+                    $badgeColor = 'bg-success'; 
                 } elseif ($status == 'putus') {
-                    $badgeColor = 'bg-warning'; // Kuning untuk "putus"
+                    $badgeColor = 'bg-warning'; 
 
-                    // Cek apakah id_meteran ada di tabel pemutusan dengan status "disetujui"
                     $pemutusanModel = new \App\Models\PemutusanModel();
                     $pemutusan = $pemutusanModel->where('id_meteran', $pengguna['id_meteran'])
                                                 ->where('status', 'disetujui')
                                                 ->first();
 
                     if ($pemutusan) {
-                        $extraBadge = '<span class="badge bg-warning ms-2">Pengajuan Oleh Pengguna</span>'; // Badge tambahan jika disetujui
+                        $extraBadge = '<span class="badge bg-warning ms-2">Pengajuan Oleh Pengguna</span>'; 
                     }else{
-                        $extraBadge = '<span class="badge bg-warning ms-2">Diputus Admin</span>'; // Badge tambahan jika disetujui
+                        $extraBadge = '<span class="badge bg-warning ms-2">Diputus Admin</span>'; 
                     }
                 } elseif ($status == 'belum aktif') {
-                    $badgeColor = 'bg-danger'; // Merah untuk "belum aktif"
+                    $badgeColor = 'bg-danger'; 
                 }
                 ?>
 

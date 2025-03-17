@@ -451,6 +451,7 @@ class AdminController extends Controller
     $survey = $surveyModel->where('id_meteran', $id_meteran)->first();
     $tanggal_pembayaran = $survey ? $survey['tanggal_survey'] : date('Y-m-d');
 
+    $batasWaktuBayar = date('Y-m-d', strtotime($tanggal_pembayaran . ' +3 days'));
     $bulan = date('m');
     $tahun = date('Y');
     $invoice_id = "INVOICE-{$id_meteran}-{$bulan}{$tahun}";
@@ -500,6 +501,7 @@ class AdminController extends Controller
         'status_bayar' => 'Lunas',
         'tanggal_pembayaran' => $tanggal_pembayaran,
         'bukti_bayar' => $bukti_bayar,
+        'batas_waktu_bayar' => $batasWaktuBayar,
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
     ]);

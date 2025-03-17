@@ -42,7 +42,7 @@
                                 <?= esc($survey['status']); ?>
                             </span>
                         </td>
-                        <td><?= esc($survey['tanggal_survey'] ?? 'Belum Ditentukan'); ?></td>
+                        <td><?= esc($survey['tanggal_survey'] ?? 'Belum Disurvey'); ?></td>
                         <td>
                             <a href="<?= base_url('/petugas/hasil_survey/' . esc($survey['id_meteran'])); ?>" 
                             class="btn btn-primary btn-sm">

@@ -7,7 +7,13 @@
         <h6 class="m-0 font-weight-bold text-primary">Konfirmasi Registrasi Awal</h6>
     </div>
     <div class="card-body">
-        <?php if ($pengguna['status_bayar'] === 'belum bayar') : ?>
+            <?php if (!$pengguna['survey']) : ?>
+            <div class="alert alert-info text-center">
+                <h5 class="font-weight-bold">Petugas belum dikirim, tunggu konfirmasi admin</h5>
+                <p>Silakan tunggu, pembayaran Anda sedang dalam proses verifikasi oleh admin.</p>
+                <i class="fas fa-clock fa-3x text-primary mt-3"></i>
+            </div>
+        <?php elseif ($pengguna['status_bayar'] === 'belum bayar') : ?>
             <form action="<?= base_url('/user/pembayaran-awal'); ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field(); ?>
                 <input type="hidden" name="id_meteran" value="<?= esc($pengguna['id_meteran']); ?>">
@@ -51,6 +57,7 @@
                 <i class="fas fa-clock fa-3x text-primary mt-3"></i>
             </div>
         <?php endif; ?>
+
     </div>
 </div>
 

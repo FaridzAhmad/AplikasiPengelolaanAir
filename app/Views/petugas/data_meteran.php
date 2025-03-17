@@ -4,7 +4,7 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Data Pengajuan Sambungan Baru</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Input Data Meteran</h6>
     </div>
     <div class="card-body">
         <?php if (session()->getFlashdata('success')): ?>
@@ -42,9 +42,9 @@
                             </span>
                         </td>
                         <td>
-                            <a href="<?= base_url('/petugas/hasil_survey/' . esc($u['id_meteran'])); ?>" 
+                            <a href="<?= base_url('/petugas/input-meteran/' . esc($u['id_meteran'])); ?>" 
                             class="btn btn-primary btn-sm">
-                                Isi Hasil Survey
+                                Input Data Meteran
                             </a>
                         </td>
                     </tr>

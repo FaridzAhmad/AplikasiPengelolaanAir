@@ -60,6 +60,8 @@ $routes->get('/petugas/sambungan-baru', 'PetugasController::sambunganBaru');
 $routes->post('/petugas/hasil-survey/upload', 'PetugasController::uploadHasilSurvey');
 $routes->get('/petugas/hasil_survey/(:num)', 'PetugasController::hasilSurvey/$1');
 $routes->get('/petugas/data-meteran', 'PetugasController::dataMeteran');
+$routes->get('/petugas/input-meteran/(:segment)', 'PetugasController::inputMeteran/$1');
+$routes->post('/petugas/simpan-meteran/(:segment)', 'PetugasController::simpanMeteran/$1');
 
 
 $routes->get('/teknisi/dashboard', 'TeknisiController::index', ['filter' => 'auth']);

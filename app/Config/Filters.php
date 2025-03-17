@@ -35,6 +35,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'  => \App\Filters\AuthFilter::class,
+        'waNotification' => \App\Filters\WaNotificationFilter::class,
     ];
 
     /**
@@ -73,6 +74,7 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
+            'waNotification'
         ],
         'after' => [
             // 'honeypot',
@@ -105,6 +107,7 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [
-        'auth' => ['before' => ['admin/*', 'user/*', 'petugas/*']]
+        'auth' => ['before' => ['admin/*', 'user/*', 'petugas/*']],
+        'waNotification' => ['before' => ['dashboard/*']],
     ];
 }

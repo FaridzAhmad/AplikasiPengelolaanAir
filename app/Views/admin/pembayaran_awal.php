@@ -55,15 +55,14 @@
                     <td>Rp<?= number_format($row['nominal'], 2, ',', '.'); ?></td>
                     <td>
                         <?php if (!empty($row['tanggal_pembayaran'])): ?>
-                            <a href="<?= base_url($row['tanggal_pembayaran']); ?>" target="_blank">Lihat Bukti</a>
+                            <span class="text-success"><?= date('d-m-Y', strtotime($row['tanggal_pembayaran'])); ?></span>
                         <?php else: ?>
-                            <span class="text-danger">Belum Ada tanggal Pembayaran</span>
+                            <span class="text-danger">Belum Ada Tanggal Pembayaran</span>
                         <?php endif; ?>
                     </td>
                     <td>
-                    <?php if ($row['status_bayar_inv'] == 'Lunas') : ?>
-                        <span class="badge badge-success">Lunas</span>
-                    <?php else : ?>
+                    <?php if ($row['status_bayar'] == 'sudah bayar') : ?>
+                       
                         <form action="<?= base_url('/admin/konfirmasi-pembayaran/' . $row['id_meteran']); ?>" method="post" onsubmit="return confirm('Terima bukti pembayaran ini?');">
                             <?= csrf_field(); ?>
                             <button type="submit" class="btn btn-success btn-sm">✔ Terima Pembayaran</button>

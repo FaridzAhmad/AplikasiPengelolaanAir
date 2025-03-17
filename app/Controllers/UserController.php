@@ -201,9 +201,19 @@ class UserController extends Controller
         $userId = session('user_id'); 
 
         $userModel = new UserModel();
-        $pengguna = $userModel->select('pengguna.*, users.email, transaksi_awal.nominal, transaksi_awal.status_bayar, transaksi_awal.bukti_bayar, transaksi_awal.tanggal_pembayaran')
+        $pengguna = $userModel->select('
+                pengguna.*, 
+                users.email, 
+                transaksi_awal.nominal, 
+                transaksi_awal.status_bayar, 
+                transaksi_awal.bukti_bayar, 
+                transaksi_awal.tanggal_pembayaran, 
+                IFNULL(survey_awal.id, FALSE) AS survey, 
+                survey_awal.tanggal_survey
+            ')
             ->join('users', 'users.id = pengguna.users_id')
             ->join('transaksi_awal', 'transaksi_awal.id_meteran = pengguna.id_meteran', 'left') 
+            ->join('survey_awal', 'survey_awal.id_meteran = pengguna.id_meteran', 'left') 
             ->where('users.id', $userId)
             ->first();
 
@@ -211,9 +221,14 @@ class UserController extends Controller
             return redirect()->to('/login')->with('error', 'Data pengguna tidak ditemukan.');
         }
 
+        $pengguna['survey'] = $pengguna['survey'] ? $pengguna['survey'] : false;
+
         $data['pengguna'] = $pengguna;
+        // dd($data); 
+
         return view('user/tagihan_awal', $data);
     }
+
 
 }
 
