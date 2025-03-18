@@ -8,8 +8,10 @@ use App\Models\SurveyAwalModel;
 use App\Models\UserModel;
 use App\Models\TransaksiModel;
 use App\Models\InvoiceModel;
+use App\Models\PengumumanModel;
 
-class PetugasController extends Controller
+
+class PetugasController extends BaseController
 {
     public function index()
     {
@@ -223,6 +225,15 @@ class PetugasController extends Controller
 
     return redirect()->to('/petugas/data-meteran')->with('success', 'Input data meteran berhasil disimpan.');
 }
+public function pengumuman()
+    {
+        $pengumumanModel = new PengumumanModel();
+        
+        $data['pengumuman'] = $pengumumanModel
+            ->like('target', 'petugas')
+            ->findAll();
 
+        return view('petugas/pengumuman', $data);
+    }
 
 }

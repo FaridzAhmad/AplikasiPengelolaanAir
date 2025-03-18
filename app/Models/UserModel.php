@@ -26,6 +26,24 @@ class UserModel extends Model
                     ->where('pengguna.users_id', $userId) 
                     ->first(); 
     }
-
+    
+    public function getDataPenggunaAll($userId)
+    {
+        return $this->select('
+                pengguna.*, 
+                users.email, 
+                transaksi_awal.nominal, 
+                transaksi_awal.status_bayar, 
+                transaksi_awal.bukti_bayar, 
+                transaksi_awal.tanggal_pembayaran, 
+                IFNULL(survey_awal.id, FALSE) AS survey, 
+                survey_awal.tanggal_survey
+            ')
+            ->join('users', 'users.id = pengguna.users_id')
+            ->join('transaksi_awal', 'transaksi_awal.id_meteran = pengguna.id_meteran', 'left')
+            ->join('survey_awal', 'survey_awal.id_meteran = pengguna.id_meteran', 'left')
+            ->where('users.id', $userId)
+            ->first();
+    }
 
 }

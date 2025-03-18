@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 use App\Models\AdminModel;
 use App\Models\PetugasModel;
 use App\Models\UserModel;
-
+use App\Models\PengumumanModel;
 
 /**
  * Class BaseController
@@ -54,13 +54,39 @@ abstract class BaseController extends Controller
     protected $admins;
     protected $petugass;
     protected $users;
+
+
+    protected $data = [];
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        // Do Not Edit This Line
         parent::initController($request, $response, $logger);
+        
+        $userRole = session('role');
 
-        // Preload any models, libraries, etc, here.
+        $roleMapping = [
+            2 => 'petugas',
+            3 => 'pengguna'
+        ];
 
-        // E.g.: $this->session = service('session');
+        $userRoleString = isset($roleMapping[$userRole]) ? $roleMapping[$userRole] : null;
+
+        if ($userRoleString) {
+            $pengumumanModel = new PengumumanModel();
+            $threeDaysAgo = date('Y-m-d H:i:s', strtotime('-25 days'));
+
+            $this->data['recentAnnouncements'] = $pengumumanModel
+                ->groupStart()
+                    ->where('target', $userRoleString)  
+                    ->orLike('target', $userRoleString . ',')   
+                    ->orLike('target', ',' . $userRoleString)  
+                    ->orLike('target', ',' . $userRoleString . ',') 
+                ->groupEnd()
+                ->where('created_at >=', $threeDaysAgo)
+                ->countAllResults();
+
+            service('renderer')->setData($this->data);
+        }
+
     }
+
 }

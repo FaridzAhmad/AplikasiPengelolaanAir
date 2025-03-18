@@ -62,11 +62,16 @@
             </div>
 
             <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+            <li class="nav-item <?= (current_url() == base_url('petugas/pengumuman')) ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= base_url('petugas/pengumuman') ?>">
                     <i class="fas fa-fw fa-bullhorn"></i>
-                    <span>Pengumuman</span></a>
+                    <span>Pengumuman</span>
+                    <?php if ($recentAnnouncements > 0): ?>
+                        <span class="badge badge-danger"><?= $recentAnnouncements; ?></span>
+                    <?php endif; ?>
+                </a>
             </li>
+
 
             <!-- Nav Item - Galer -->
             <li class="nav-item  <?= (current_url() == base_url('petugas/sambungan-baru')) ? 'active' : '' ?>">

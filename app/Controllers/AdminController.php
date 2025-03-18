@@ -36,21 +36,23 @@ class AdminController extends Controller
 
     public function index()
     {
-        // $session = session();
-        // $adminModel = new AdminModel();
+        $userModel = new UserModel();
+        $invoiceModel = new InvoiceModel();
+        $pengumumanModel = new PengumumanModel();
+        $transaksiAwalModel = new TransaksiAwalModel();
+        $petugasModel = new PetugasModel();
 
-        // 
-        // $adminId = $session->get('user_id'); 
+        $data = [
+            'admins' => $this->admins, // Data admin dari BaseController
+            'total_sambungan_baru' => $transaksiAwalModel->countAllResults(),
+            'total_pengguna' => $userModel->countAllResults(),
+            'total_petugas' => $petugasModel->countAllResults(),
+            'total_pengumuman' => $pengumumanModel->countAllResults(),
+            'total_tagihan_belum_lunas' => $invoiceModel->where('status_bayar', 'Belum Lunas')->countAllResults(),
+            'total_tagihan_lunas' => $invoiceModel->where('status_bayar', 'Lunas')->countAllResults(),
+        ];
 
-        // 
-        // if (!$adminId) {
-        //     return redirect()->to('/login')->with('error', 'Silakan login terlebih dahulu.');
-        // }
-
-        // 
-        // $this->admins = $adminModel->getAdminName($adminId);
-
-        return view('admin/dashboard', ['admins' => $this->admins]);
+        return view('admin/section_dashboard', $data);
     }
 
     public function customer()
@@ -434,79 +436,115 @@ class AdminController extends Controller
     }
 
     public function konfirmasiPembayaran($id_meteran)
-{
-    $transaksiModel = new TransaksiAwalModel();
-    $penggunaModel = new UserModel();
-    $surveyModel = new SurveyAwalModel();
-    $invoiceModel = new InvoiceModel();
-    $transaksiBulananModel = new TransaksiModel(); 
+    {
+        $transaksiModel = new TransaksiAwalModel();
+        $penggunaModel = new UserModel();
+        $surveyModel = new SurveyAwalModel();
+        $invoiceModel = new InvoiceModel();
+        $transaksiBulananModel = new TransaksiModel(); 
 
-    $transaksi = $transaksiModel->where('id_meteran', $id_meteran)->first();
+        $transaksi = $transaksiModel->where('id_meteran', $id_meteran)->first();
 
-    if (!$transaksi) {
-        return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
+        if (!$transaksi) {
+            return redirect()->back()->with('error', 'Transaksi tidak ditemukan.');
+        }
+
+        $bukti_bayar = $transaksi['bukti_bayar'];
+        $survey = $surveyModel->where('id_meteran', $id_meteran)->first();
+        $tanggal_pembayaran = $survey ? $survey['tanggal_survey'] : date('Y-m-d');
+
+        $batasWaktuBayar = date('Y-m-d', strtotime($tanggal_pembayaran . ' +3 days'));
+        $bulan = date('m');
+        $tahun = date('Y');
+        $invoice_id = "INVOICE-{$id_meteran}-{$bulan}{$tahun}";
+
+        $transaksiModel->where('id_meteran', $id_meteran)->set([
+            'status_bayar' => 'sudah bayar',
+            'tanggal_pembayaran' => date('Y-m-d H:i:s')
+        ])->update();
+
+        $penggunaModel->where('id_meteran', $id_meteran)->set([
+            'status_meteran' => 'aktif'
+        ])->update();
+        
+        // dd([
+        //     'id_meteran' => $id_meteran,
+        //     'invoice' => $invoice_id,
+        //     'meteran_awal' => 0,
+        //     'meteran_akhir' => 0,
+        //     'jumlah_pakai' => 0,
+        //     'jumlah_tagihan' => 0,
+        //     'periode_bulan' => $bulan,
+        //     'periode_tahun' => $tahun,
+        //     'created_at' => date('Y-m-d H:i:s'),
+        //     'updated_at' => date('Y-m-d H:i:s')
+        // ]);
+        $transaksiBulananModel->insert([
+            'id_meteran' => $id_meteran,
+            'invoice' => $invoice_id,  
+            'meteran_awal' => 0,
+            'meteran_akhir' => 0,
+            'jumlah_pakai' => 0,
+            'jumlah_tagihan' => 0,
+            'periode_bulan' => $bulan,
+            'periode_tahun' => $tahun,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $cekTransaksi = $transaksiBulananModel->where('invoice', $invoice_id)->first();
+        if (!$cekTransaksi) {
+            return redirect()->back()->with('error', 'Gagal menambahkan transaksi bulanan.');
+        }
+
+        $invoiceModel->insert([
+            'invoice' => $invoice_id,
+            'jumlah_tagihan' => 0,
+            'status_bayar' => 'Lunas',
+            'tanggal_pembayaran' => $tanggal_pembayaran,
+            'bukti_bayar' => $bukti_bayar,
+            'batas_waktu_bayar' => $batasWaktuBayar,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi dan transaksi bulanan dibuat.');
     }
 
-    $bukti_bayar = $transaksi['bukti_bayar'];
-    $survey = $surveyModel->where('id_meteran', $id_meteran)->first();
-    $tanggal_pembayaran = $survey ? $survey['tanggal_survey'] : date('Y-m-d');
+    public function pembayaranBulanan()
+    {
+        $invoiceModel = new InvoiceModel();
+        $data['invoices'] = $invoiceModel->getPembayaranBulanan();
 
-    $batasWaktuBayar = date('Y-m-d', strtotime($tanggal_pembayaran . ' +3 days'));
-    $bulan = date('m');
-    $tahun = date('Y');
-    $invoice_id = "INVOICE-{$id_meteran}-{$bulan}{$tahun}";
-
-    $transaksiModel->where('id_meteran', $id_meteran)->set([
-        'status_bayar' => 'sudah bayar',
-        'tanggal_pembayaran' => date('Y-m-d H:i:s')
-    ])->update();
-
-    $penggunaModel->where('id_meteran', $id_meteran)->set([
-        'status_meteran' => 'aktif'
-    ])->update();
-    
-    // dd([
-    //     'id_meteran' => $id_meteran,
-    //     'invoice' => $invoice_id,
-    //     'meteran_awal' => 0,
-    //     'meteran_akhir' => 0,
-    //     'jumlah_pakai' => 0,
-    //     'jumlah_tagihan' => 0,
-    //     'periode_bulan' => $bulan,
-    //     'periode_tahun' => $tahun,
-    //     'created_at' => date('Y-m-d H:i:s'),
-    //     'updated_at' => date('Y-m-d H:i:s')
-    // ]);
-    $transaksiBulananModel->insert([
-        'id_meteran' => $id_meteran,
-        'invoice' => $invoice_id,  
-        'meteran_awal' => 0,
-        'meteran_akhir' => 0,
-        'jumlah_pakai' => 0,
-        'jumlah_tagihan' => 0,
-        'periode_bulan' => $bulan,
-        'periode_tahun' => $tahun,
-        'created_at' => date('Y-m-d H:i:s'),
-        'updated_at' => date('Y-m-d H:i:s')
-    ]);
-
-    $cekTransaksi = $transaksiBulananModel->where('invoice', $invoice_id)->first();
-    if (!$cekTransaksi) {
-        return redirect()->back()->with('error', 'Gagal menambahkan transaksi bulanan.');
+        return view('admin/pembayaran_bulanan', $data);
     }
 
-    $invoiceModel->insert([
-        'invoice' => $invoice_id,
-        'jumlah_tagihan' => 0,
-        'status_bayar' => 'Lunas',
-        'tanggal_pembayaran' => $tanggal_pembayaran,
-        'bukti_bayar' => $bukti_bayar,
-        'batas_waktu_bayar' => $batasWaktuBayar,
-        'created_at' => date('Y-m-d H:i:s'),
-        'updated_at' => date('Y-m-d H:i:s')
-    ]);
+    public function konfirmasiPembayaranBulanan($invoice)
+    {
+        $invoiceModel = new InvoiceModel();
 
-    return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi dan transaksi bulanan dibuat.');
-}
+        // Cek apakah invoice ada
+        $dataInvoice = $invoiceModel->where('invoice', $invoice)->first();
+        if (!$dataInvoice) {
+            return redirect()->to('/admin/pembayaran_bulanan')->with('error', 'Invoice tidak ditemukan.');
+        }
+
+        // Debugging: Lihat data invoice yang diterima
+        // dd($dataInvoice);
+
+        // Pastikan bukti pembayaran sudah ada sebelum mengubah status
+        if (empty($dataInvoice['bukti_bayar'])) {
+            return redirect()->to('/admin/pembayaran_bulanan')->with('error', 'Bukti pembayaran belum diunggah.');
+        }
+
+        // Update status menjadi "Lunas" dan simpan tanggal konfirmasi
+        $invoiceModel->where('invoice', $invoice)
+                    ->set([
+                        'status_bayar' => 'Lunas'
+                    ])
+                    ->update();
+
+        return redirect()->to('/admin/pembayaran-bulanan')->with('success', 'Pembayaran telah dikonfirmasi.');
+    }
 
 }

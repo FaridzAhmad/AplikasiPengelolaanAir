@@ -7,9 +7,11 @@ use App\Models\UserModel;
 use App\Models\PemutusanModel;
 use App\Models\KeluhanModel;
 use App\Models\TransaksiAwalModel;
+use App\Models\InvoiceModel;
+use App\Models\PengumumanModel;
 
 
-class UserController extends Controller
+class UserController extends BaseController
 {
     protected $user;
 
@@ -201,21 +203,7 @@ class UserController extends Controller
         $userId = session('user_id'); 
 
         $userModel = new UserModel();
-        $pengguna = $userModel->select('
-                pengguna.*, 
-                users.email, 
-                transaksi_awal.nominal, 
-                transaksi_awal.status_bayar, 
-                transaksi_awal.bukti_bayar, 
-                transaksi_awal.tanggal_pembayaran, 
-                IFNULL(survey_awal.id, FALSE) AS survey, 
-                survey_awal.tanggal_survey
-            ')
-            ->join('users', 'users.id = pengguna.users_id')
-            ->join('transaksi_awal', 'transaksi_awal.id_meteran = pengguna.id_meteran', 'left') 
-            ->join('survey_awal', 'survey_awal.id_meteran = pengguna.id_meteran', 'left') 
-            ->where('users.id', $userId)
-            ->first();
+        $pengguna = $userModel->getDataPenggunaAll($userId);
 
         if (!$pengguna) {
             return redirect()->to('/login')->with('error', 'Data pengguna tidak ditemukan.');
@@ -228,6 +216,98 @@ class UserController extends Controller
 
         return view('user/tagihan_awal', $data);
     }
+
+    public function tagihan()
+    {
+        $userId = session('user_id'); 
+        
+        $tagihanModel = new InvoiceModel();
+        $userModel = new UserModel();
+
+        // Ambil data pengguna berdasarkan user_id
+        $pengguna = $userModel->getDataPenggunaAll($userId);
+
+        if (!$pengguna) {
+            return redirect()->to('/login')->with('error', 'Data pengguna tidak ditemukan.');
+        }
+
+        $id_meteran = $pengguna['id_meteran']; // Jika $pengguna adalah array
+
+        // Ambil data tagihan berdasarkan id_meteran
+        $data['pengguna'] = $pengguna;
+        $data['tagihan'] = $tagihanModel->getInvoiceDetails($id_meteran);
+
+        // $tagihan = isset($data['tagihan'][1]) ? $data['tagihan'][1] : null;
+        // dd($data['tagihan']);
+        return view('user/tagihan', $data);
+
+    }
+
+    public function bayarTagihan($invoice)
+    {
+        $userId = session('user_id'); 
+    
+        $tagihanModel = new InvoiceModel();
+        $userModel = new UserModel();
+
+        $pengguna = $userModel->getDataPenggunaAll($userId);
+
+        $invoiceModel = new InvoiceModel();
+        $data['invoice'] = $invoiceModel->where('invoice', $invoice)->first();
+        
+        // dd($data);
+        if (!$data['invoice']) {
+            return redirect()->to('user/tagihan')->with('error', 'Tagihan tidak ditemukan.');
+        }
+        
+        $data['pengguna'] = $pengguna;
+        return view('user/bayar_tagihan', $data);
+    }
+
+    public function prosesPembayaranInvoice()
+    {
+        $invoiceModel = new InvoiceModel();
+        $invoice = $this->request->getPost('invoice'); 
+        $file = $this->request->getFile('bukti_bayar');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $uploadPath = 'uploads/bukti_pembayaran';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true); 
+            }
+            $newName = $file->getRandomName();
+            $file->move($uploadPath, $newName);
+
+            $invoiceModel->where('invoice', $invoice)
+                ->set([
+                    'bukti_bayar' => $newName,
+                    'tanggal_pembayaran' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+
+            return redirect()->to('/user/tagihan')->with('success', 'Bukti pembayaran berhasil dikirim.');
+        }
+
+        return redirect()->to('/user/tagihan')->with('error', 'Gagal mengupload bukti pembayaran.');
+
+        }
+
+        public function pengumuman()
+        {
+            // dd($this->recentAnnouncements);
+            $userId = session('user_id'); 
+            $userModel = new UserModel();
+
+            $pengguna = $userModel->getDataPenggunaAll($userId);
+            $pengumumanModel = new PengumumanModel();
+            
+            $data['pengguna'] = $pengguna;
+            $data['pengumuman'] = $pengumumanModel
+                ->like('target', 'pengguna')
+                ->findAll();
+
+            return view('user/pengumuman', $data);
+        }
 
 
 }

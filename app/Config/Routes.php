@@ -38,8 +38,8 @@ $routes->get('/admin/teknisi/(:segment)', 'AdminController::detailTeknisi/$1');
 $routes->post('/admin/kirimPetugas', 'AdminController::kirimPetugas');
 $routes->get('/admin/pembayaran-registrasi', 'AdminController::pembayaranRegistrasi');
 $routes->post('/admin/konfirmasi-pembayaran/(:segment)', 'AdminController::konfirmasiPembayaran/$1');
-
-
+$routes->get('/admin/pembayaran-bulanan', 'AdminController::pembayaranBulanan');
+$routes->post('/admin/konfirmasi-bulanan/(:segment)', 'AdminController::konfirmasiPembayaranBulanan/$1');
 
 
 
@@ -51,7 +51,10 @@ $routes->get('/user/keluhan', 'UserController::formKeluhan', ['filter' => 'auth'
 $routes->post('/user/keluhan/simpan', 'UserController::simpanKeluhan', ['filter' => 'auth']);
 $routes->post('/user/pembayaran-awal', 'UserController::konfirmasiPembayaranAwal');
 $routes->get('/user/tagihan-awal', 'UserController::tagihanAwal');
-
+$routes->get('/user/tagihan', 'UserController::tagihan');
+$routes->get('/user/bayar_tagihan/(:segment)', 'UserController::bayarTagihan/$1');
+$routes->post('user/proses_pembayaran', 'UserController::prosesPembayaranInvoice');
+$routes->get('/user/pengumuman', 'UserController::pengumuman');
 
 
 
@@ -62,6 +65,6 @@ $routes->get('/petugas/hasil_survey/(:num)', 'PetugasController::hasilSurvey/$1'
 $routes->get('/petugas/data-meteran', 'PetugasController::dataMeteran');
 $routes->get('/petugas/input-meteran/(:segment)', 'PetugasController::inputMeteran/$1');
 $routes->post('/petugas/simpan-meteran/(:segment)', 'PetugasController::simpanMeteran/$1');
-
+$routes->get('/petugas/pengumuman', 'PetugasController::pengumuman');
 
 $routes->get('/teknisi/dashboard', 'TeknisiController::index', ['filter' => 'auth']);

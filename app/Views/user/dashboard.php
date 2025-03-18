@@ -18,6 +18,7 @@
         rel="stylesheet">
     <link href="<?= base_url('assets/img/logo_air.png')?>" rel="icon">
     <link href="<?= base_url('assets/img/logo_air.png')?>" rel="logo">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- Custom styles for this template-->
     <link href="<?= base_url('assets/css/sb-admin-2.min.css')?>" rel="stylesheet">
 
@@ -58,11 +59,17 @@
             </div>
 
             <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+            <li class="nav-item <?= (current_url() == base_url('user/pengumuman')) ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= base_url('user/pengumuman') ?>">
                     <i class="fas fa-fw fa-bullhorn"></i>
-                    <span>Pengumuman</span></a>
+                    <span>Pengumuman</span>
+                    <?php if ($recentAnnouncements > 0): ?>
+                        <span class="badge badge-danger"><?= $recentAnnouncements; ?></span>
+                    <?php endif; ?>
+                </a>
             </li>
+
+
 
             <!-- Nav Item - Galer -->
             <li class="nav-item">
@@ -72,19 +79,20 @@
             </li>
 
             <!-- Nav Item - Data Pelanggan -->
-            <li class="nav-item">
+            <li class="nav-item <?= (uri_string() == 'user/tagihan' || uri_string() == 'user/tagihan-awal') ? 'active' : ''; ?>">
                 <?php if ($pengguna['status_meteran'] == 'aktif'): ?>
-                    <a class="nav-link" href="<?= base_url('/user/tagihan'); ?>">
+                    <a class="nav-link <?= (uri_string() == 'user/tagihan') ? 'active' : ''; ?>" href="<?= base_url('/user/tagihan'); ?>">
                         <i class="fas fa-fw fa-file-invoice-dollar"></i>
                         <span>Tagihan</span>
                     </a>
                 <?php else: ?>
-                    <a class="nav-link" href="<?= base_url('/user/tagihan-awal'); ?>">
+                    <a class="nav-link <?= (uri_string() == 'user/tagihan-awal') ? 'active' : ''; ?>" href="<?= base_url('/user/tagihan-awal'); ?>">
                         <i class="fas fa-fw fa-file-invoice-dollar"></i>
                         <span>Tagihan Awal</span>
                     </a>
                 <?php endif; ?>
             </li>
+
 
 
             <li class="nav-item <?= (current_url() == base_url('user/putus-sambungan')) ? 'active' : '' ?>">
@@ -248,7 +256,25 @@
     <!-- Page level custom scripts -->
     <script src="<?= base_url('assets/js/demo/chart-area-demo.js')?>"></script>
     <script src="<?= base_url('assets/js/demo/chart-pie-demo.js')?>"></script>
+     <!-- DataTables JS -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+    <script>
+    $(document).ready(function () {
+
+        if ($.fn.DataTable) {
+            $('#dataCustomer').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+        } else {
+            console.error("Error: DataTables tidak ditemukan.");
+        }
+    });
+    </script>
 </body>
 
 </html>
