@@ -65,7 +65,8 @@ abstract class BaseController extends Controller
 
         $roleMapping = [
             2 => 'petugas',
-            3 => 'pengguna'
+            3 => 'pengguna',
+            4 => 'teknisi',
         ];
 
         $userRoleString = isset($roleMapping[$userRole]) ? $roleMapping[$userRole] : null;

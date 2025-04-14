@@ -7,12 +7,13 @@ class KeluhanModel extends Model
 {
     protected $table = 'keluhan';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['id_meteran', 'keluhan', 'petugas', 'status','foto', 'created_at'];
+    protected $allowedFields = ['id_meteran', 'keluhan', 'teknisi', 'status','foto', 'created_at','foto_teknisi'];
 
     public function getAllKeluhan()
     {
-        return $this->select('keluhan.*, petugas.nama as nama_petugas')
-                    ->join('petugas', 'petugas.id = keluhan.petugas', 'left')
+        return $this->select('keluhan.*, teknisi.nama, pengguna.nama, pengguna.alamat, pengguna.no_hp')
+                    ->join('teknisi', 'teknisi.users_id = keluhan.teknisi', 'left')
+                    ->join('pengguna', 'keluhan.id_meteran = pengguna.id_meteran')
                     ->orderBy('created_at', 'DESC')
                     ->findAll();
     }
@@ -20,11 +21,11 @@ class KeluhanModel extends Model
     public function getKeluhanById($id)
     {
         return $this->select('keluhan.*, 
-                            petugas.nama as nama_petugas, 
+                            teknisi.users_id,
                             pengguna.nama as nama_pengguna, 
                             pengguna.alamat,
                             pengguna.no_hp')
-                    ->join('petugas', 'petugas.id = keluhan.petugas', 'left')
+                    ->join('teknisi', 'teknisi.users_id = keluhan.teknisi', 'left')
                     ->join('pengguna', 'pengguna.id_meteran = keluhan.id_meteran', 'left')
                     ->where('keluhan.id', $id)
                     ->first();

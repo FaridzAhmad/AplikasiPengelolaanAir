@@ -113,9 +113,20 @@
             </li> -->
 
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Laporan</span></a>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-file-signature"></i>
+                    <span>Laporan</span>
+                </a>
+                <div id="collapseThree" class="collapse <?= (in_array(uri_string(), ['admin/laporan/sambungan-baru', 'admin/laporan/pemutusan-sambungan', 'admin/laporan/keluhan', 'admin/laporan/pembayaran'])) ? 'show' : '' ?>" 
+                    aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item <?= (uri_string() == 'admin/laporan/sambungan-baru') ? 'active' : '' ?>" href="<?= base_url('admin/laporan/sambungan-baru') ?>">Laporan Sambungan Baru</a>
+                        <a class="collapse-item text-wrap <?= (uri_string() == 'admin/laporan/pemutusan-sambungan') ? 'active' : '' ?>" href="<?= base_url('admin/laporan/pemutusan-sambungan') ?>">Laporan Pemutusan Sambungan</a>
+                        <a class="collapse-item <?= (uri_string() == 'admin/laporan/pembayaran') ? 'active' : '' ?>" href="<?= base_url('admin/laporan/pembayaran') ?>">Laporan Pembayaran</a>
+                        <a class="collapse-item <?= (uri_string() == 'admin/laporan/keluhan') ? 'active' : '' ?>" href="<?= base_url('admin/laporan/keluhan') ?>">Laporan Keluhan</a>
+                    </div>
+                </div>
             </li>
 
             <!-- Divider -->

@@ -179,17 +179,22 @@ class AdminController extends Controller
     public function listKeluhan()
     {
         $keluhanModel = new KeluhanModel();
-        $data['keluhan'] = $keluhanModel->getAllKeluhan(); 
+        $teknisiModel = new TeknisiModel(); 
+
+        $data['keluhan'] = $keluhanModel->getAllKeluhan();
+        $data['teknisi'] = $teknisiModel->findAll();
+
         return view('admin/keluhan', $data);
     }
+
 
     public function detailKeluhan($id)
     {
         $keluhanModel = new KeluhanModel();
-        $petugasModel = new PetugasModel();
+        $teknisiModel = new TeknisiModel();
 
         $data['keluhan'] = $keluhanModel->getKeluhanById($id);
-        $data['petugas'] = $petugasModel->findAll(); 
+        $data['teknisi'] = $teknisiModel->findAll(); 
         // dd($data);
         if (!$data['keluhan']) {
             return redirect()->to('/admin/keluhan')->with('error', 'Keluhan tidak ditemukan.');
@@ -198,25 +203,43 @@ class AdminController extends Controller
         return view('admin/detail_keluhan', $data);
     }
 
-    public function updateKeluhan()
+    // public function updateKeluhan()
+    // {
+    //     $keluhanModel = new KeluhanModel();
+
+    //     $id = $this->request->getPost('id');
+    //     $status = $this->request->getPost('status');
+    //     $petugas = $this->request->getPost('petugas');
+
+    //     if ($id) {
+    //         $keluhanModel->update($id, [
+    //             'status' => $status,
+    //             'petugas' => $petugas
+    //         ]);
+
+    //         return redirect()->to('/admin/keluhan')->with('success', 'Status keluhan berhasil diperbarui.');
+    //     }
+
+    //     return redirect()->to('/admin/keluhan')->with('error', 'Gagal memperbarui keluhan.');
+    // }
+
+    public function kirimTeknisi()
     {
         $keluhanModel = new KeluhanModel();
 
-        $id = $this->request->getPost('id');
-        $status = $this->request->getPost('status');
-        $petugas = $this->request->getPost('petugas');
+        $keluhan_id = $this->request->getPost('keluhan_id');
+        $teknisi_id = $this->request->getPost('teknisi_id');
 
-        if ($id) {
-            $keluhanModel->update($id, [
-                'status' => $status,
-                'petugas' => $petugas
-            ]);
-
-            return redirect()->to('/admin/keluhan')->with('success', 'Status keluhan berhasil diperbarui.');
+        if (!$keluhan_id || !$teknisi_id) {
+            return redirect()->back()->with('error', 'Harap pilih teknisi.');
         }
 
-        return redirect()->to('/admin/keluhan')->with('error', 'Gagal memperbarui keluhan.');
+        // dd($teknisi_id);
+        $keluhanModel->update($keluhan_id, ['teknisi' => $teknisi_id, 'status' => 'proses']);
+
+        return redirect()->back()->with('success', 'Teknisi berhasil ditugaskan.');
     }
+
 
     public function tambahPetugas()
     {
@@ -523,21 +546,17 @@ class AdminController extends Controller
     {
         $invoiceModel = new InvoiceModel();
 
-        // Cek apakah invoice ada
         $dataInvoice = $invoiceModel->where('invoice', $invoice)->first();
         if (!$dataInvoice) {
             return redirect()->to('/admin/pembayaran_bulanan')->with('error', 'Invoice tidak ditemukan.');
         }
 
-        // Debugging: Lihat data invoice yang diterima
         // dd($dataInvoice);
 
-        // Pastikan bukti pembayaran sudah ada sebelum mengubah status
         if (empty($dataInvoice['bukti_bayar'])) {
             return redirect()->to('/admin/pembayaran_bulanan')->with('error', 'Bukti pembayaran belum diunggah.');
         }
 
-        // Update status menjadi "Lunas" dan simpan tanggal konfirmasi
         $invoiceModel->where('invoice', $invoice)
                     ->set([
                         'status_bayar' => 'Lunas'
@@ -547,4 +566,38 @@ class AdminController extends Controller
         return redirect()->to('/admin/pembayaran-bulanan')->with('success', 'Pembayaran telah dikonfirmasi.');
     }
 
+    public function laporanKeluhan()
+    {
+        $model = new KeluhanModel();
+        $data['keluhan'] = $model->findAll();
+
+        return view('admin/laporan_keluhan', $data);
+    }
+
+    public function datalaporanKeluhan()
+    {
+        $bulan = $this->request->getGet('bulan');
+
+        if (!$bulan) {
+            return $this->response->setJSON([]); // Jika bulan tidak dipilih, kembalikan array kosong
+        }
+
+        $model = new KeluhanModel();
+        $data = $model->where("DATE_FORMAT(created_at, '%Y-%m')", $bulan)->findAll();
+
+        // Format data untuk DataTables
+        $result = [];
+        $no = 1;
+        foreach ($data as $row) {
+            $result[] = [
+                "no" => $no++,
+                "created_at" => date('Y-m-d', strtotime($row['created_at'])),
+                "id_meteran" => $row['id_meteran'],
+                "keluhan" => $row['keluhan'],
+                "status" => $row['status'],
+            ];
+        }
+
+        return $this->response->setJSON($result);
+    }
 }

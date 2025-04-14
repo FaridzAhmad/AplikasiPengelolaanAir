@@ -126,11 +126,20 @@ class UserController extends BaseController
     public function simpanKeluhan()
     {
         $keluhanModel = new KeluhanModel();
-        $userId = session()->get('user_id'); 
+        $penggunaModel = new UserModel();
+        $user_id = session()->get('user_id');
 
+        $pengguna = $penggunaModel->where('users_id', $user_id)->first();
+
+        if (!$pengguna || !isset($pengguna['id_meteran'])) {
+            return redirect()->back()->with('error', 'Data meteran tidak ditemukan.');
+        }
+
+        $id_meteran = $pengguna['id_meteran'];
+        // dd($id_meteran);
         date_default_timezone_set('Asia/Jakarta');
 
-        $lastKeluhan = $keluhanModel->where('users_id', $userId)
+        $lastKeluhan = $keluhanModel->where('id_meteran', $id_meteran)
                                     ->orderBy('created_at', 'DESC')
                                     ->first();
 
@@ -152,22 +161,23 @@ class UserController extends BaseController
         if (!$file->isValid()) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengupload foto.');
         }
+
         $newName = $file->getRandomName();
         $file->move('uploads/keluhan/', $newName);
 
         $data = [
-            'users_id' => $userId,
-            'id_meteran' => $this->request->getPost('id_meteran'),
+            'id_meteran' => $id_meteran,
             'keluhan' => $this->request->getPost('keluhan'),
             'foto' => $newName,
             'status' => 'review',
             'created_at' => date('Y-m-d H:i:s') 
         ];
-
+        // dd($data);
         $keluhanModel->insert($data);
 
         return redirect()->to('/user/keluhan')->with('success', 'Keluhan berhasil dikirim.');
     }
+
 
     public function konfirmasiPembayaranAwal()
     {

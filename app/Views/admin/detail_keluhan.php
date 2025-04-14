@@ -26,19 +26,16 @@
             <label class="form-label"><strong>No HP</strong></label>
             <input type="text" class="form-control" value="<?= esc($keluhan['no_hp']) ?>" disabled>
         </div>
-        
+
         <div class="mb-3">
-            <label class="form-label"><strong>Pilih Petugas</strong></label>
-            <select class="form-control" name="petugas">
-                <option value="">-- Pilih Petugas --</option>
-                <?php foreach ($petugas as $p) : ?>
-                    <option value="<?= esc($p['users_id']) ?>">
-                        <?= esc($p['nama']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <label class="form-label"><strong>Teknisi Yang Ditugaskan</strong></label>
+            <input type="text" class="form-control" 
+                value="<?= !empty($keluhan['teknisi']) ? esc($keluhan['teknisi']) : 'Belum Ada Teknisi' ?>" 
+                disabled>
         </div>
-        <a href="<?= base_url('/admin/petugas') ?>" class="btn btn-secondary">Kembali</a>
+
+
+        <a href="<?= base_url('/admin/keluhan') ?>" class="btn btn-secondary">Kembali</a>
     </div>
 </div>
 

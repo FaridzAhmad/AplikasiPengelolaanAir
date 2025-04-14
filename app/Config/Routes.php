@@ -28,6 +28,7 @@ $routes->post('/admin/acc-pemutusan', 'AdminController::accPemutusan', ['filter'
 $routes->get('/admin/keluhan', 'AdminController::listKeluhan', ['filter' => 'auth']);
 $routes->get('/admin/keluhan/(:num)', 'AdminController::detailKeluhan/$1', ['filter' => 'auth']);
 $routes->post('/admin/keluhan/update', 'AdminController::updateKeluhan', ['filter' => 'auth']);
+$routes->post('/admin/kirim-teknisi', 'AdminController::kirimTeknisi');
 $routes->get('/admin/petugas', 'AdminController::petugas');
 $routes->post('/admin/petugas/simpan', 'AdminController::simpanPetugas');
 $routes->get('/admin/petugas/tambah', 'AdminController::tambahPetugas');
@@ -40,7 +41,8 @@ $routes->get('/admin/pembayaran-registrasi', 'AdminController::pembayaranRegistr
 $routes->post('/admin/konfirmasi-pembayaran/(:segment)', 'AdminController::konfirmasiPembayaran/$1');
 $routes->get('/admin/pembayaran-bulanan', 'AdminController::pembayaranBulanan');
 $routes->post('/admin/konfirmasi-bulanan/(:segment)', 'AdminController::konfirmasiPembayaranBulanan/$1');
-
+$routes->get('admin/laporan/keluhan', 'AdminController::laporanKeluhan');
+$routes->get('admin/laporan/keluhan', 'AdminController::datalaporanKeluhan');
 
 
 
@@ -68,3 +70,6 @@ $routes->post('/petugas/simpan-meteran/(:segment)', 'PetugasController::simpanMe
 $routes->get('/petugas/pengumuman', 'PetugasController::pengumuman');
 
 $routes->get('/teknisi/dashboard', 'TeknisiController::index', ['filter' => 'auth']);
+$routes->get('/teknisi/pengumuman', 'TeknisiController::pengumuman');
+$routes->get('/teknisi/keluhan', 'TeknisiController::keluhan');
+$routes->post('/teknisi/upload-foto', 'TeknisiController::uploadFotoKeluhan');
