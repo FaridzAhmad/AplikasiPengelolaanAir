@@ -61,13 +61,12 @@
                         <?php endif; ?>
                     </td>
                     <td>
-                    <?php if ($row['status_bayar'] == 'sudah bayar') : ?>
-                       
-                        <form action="<?= base_url('/admin/konfirmasi-pembayaran/' . $row['id_meteran']); ?>" method="post" onsubmit="return confirm('Terima bukti pembayaran ini?');">
-                            <?= csrf_field(); ?>
-                            <button type="submit" class="btn btn-success btn-sm">✔ Terima Pembayaran</button>
-                        </form>
-                    <?php endif; ?>
+                        <?php if ($row['status_bayar'] == 'sudah bayar' && empty($row['tanggal_pembayaran'])) : ?>
+                            <form action="<?= base_url('/admin/konfirmasi-pembayaran/' . $row['id_meteran']); ?>" method="post" onsubmit="return confirm('Terima bukti pembayaran ini?');">
+                                <?= csrf_field(); ?>
+                                <button type="submit" class="btn btn-success btn-sm">✔ Terima Pembayaran</button>
+                            </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

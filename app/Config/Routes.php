@@ -73,3 +73,5 @@ $routes->get('/teknisi/dashboard', 'TeknisiController::index', ['filter' => 'aut
 $routes->get('/teknisi/pengumuman', 'TeknisiController::pengumuman');
 $routes->get('/teknisi/keluhan', 'TeknisiController::keluhan');
 $routes->post('/teknisi/upload-foto', 'TeknisiController::uploadFotoKeluhan');
+$routes->get('/teknisi/profile', 'TeknisiController::profile');
+$routes->post('/teknisi/update-profil', 'TeknisiController::updateProfil');

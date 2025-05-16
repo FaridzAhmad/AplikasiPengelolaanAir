@@ -1,4 +1,4 @@
-<?= $this->extend('petugas/dashboard') ?>
+<?= $this->extend('teknisi/dashboard') ?>
 
 <?= $this->section('content') ?>
 
@@ -91,16 +91,12 @@
     </div>
 </div>
 
-<!-- Tambahkan jQuery & Bootstrap jika belum ada -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     $(document).ready(function () {
         $('.upload-foto-btn').on('click', function () {
             var keluhanId = $(this).data('id');
             $('#keluhan_id').val(keluhanId);
-            $('#uploadFotoModal').modal('show'); // Pastikan modal muncul
+            $('#uploadFotoModal').modal('show'); 
         });
     });
 </script>
